@@ -86,6 +86,44 @@
     <div><span>Review budget</span><strong>Top 1%</strong></div>
     <div><span>Objective</span><strong>Maximise Catch@1%</strong></div>
   </div>
+
+  <div class="registry-card">
+    <div class="registry-card-header">
+      <span class="registry-label">MODEL REGISTRY</span>
+      <strong>Every experiment gets a reproducible record</strong>
+    </div>
+    <p>
+      A YAML-based model registry stores the configuration and evaluation metadata
+      for every candidate and selected model. This makes model search auditable
+      and keeps the metrics associated with the exact experiment that produced them.
+    </p>
+    <pre class="yaml-block"><code>model:
+  use_case: seller_fraud
+  target: fraud_label
+  entity: seller_id
+  scoring_timestamp: transaction_time
+  validation: temporal
+
+features:
+  registry_version: v1
+  selection_strategy: llm_use_case_gate
+
+evaluation:
+  objective: catch_at_k
+  k: 1%
+  roc_auc: &lt;captured_metric&gt;
+  catch_at_k: &lt;captured_metric&gt;
+  precision_at_k: &lt;captured_metric&gt;
+  recall_at_k: &lt;captured_metric&gt;
+
+search:
+  algorithm: TPE
+  model_family: &lt;captured&gt;
+  hyperparameters: &lt;captured&gt;
+  trial_id: &lt;captured&gt;
+  seed: &lt;captured&gt;</code></pre>
+  </div>
+
 </section>
 
 <section class="article-section">
@@ -104,7 +142,21 @@
   <div class="section-number">04</div>
   <h2>Feature selection is a sequence of gates</h2>
   <p>With hundreds or thousands of candidate features, simply ranking everything by feature importance is not enough.</p>
+  <p>
+    The pipeline maintains a <strong>feature registry</strong> containing candidate
+    features and their metadata. The LLM agent uses the declared fraud use case
+    to select and prioritise relevant features from this registry — for example,
+    seller-level behaviour for seller fraud. The deterministic gates then verify
+    availability, point-in-time correctness, leakage, stability, redundancy and
+    predictive contribution.
+  </p>
   <p>An <strong>LLM agent first interprets the fraud use case</strong> and prioritises relevant feature families. For example, seller fraud may require seller-level behaviour, while account-takeover detection may emphasise device and login behaviour. Deterministic gates then verify that the selected candidates are safe, available and useful.</p>
+
+  <div class="feature-registry-card">
+    <span class="registry-label">FEATURE REGISTRY</span>
+    <strong>Use case → relevant feature candidates</strong>
+    <p>The registry acts as the source of truth for available features and their metadata. The LLM agent selects or prioritises candidates for the requested fraud use case; deterministic gates validate them before model search.</p>
+  </div>
   <div class="feature-gates">
     <button class="feature-gate active" data-feature="usecase"><span>01</span><strong>Use-case fit</strong></button>
     <button class="feature-gate" data-feature="availability"><span>02</span><strong>Availability</strong></button>

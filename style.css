@@ -248,3 +248,47 @@ footer{border-top:1px solid var(--border);max-width:850px;margin:auto;padding:40
 #feature-description .gate-example span { display:block; margin-bottom:6px; font-size:11px; letter-spacing:.08em; font-weight:800; }
 #feature-description .gate-example p { margin:0; }
 #feature-description .gate-example code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.92em; }
+
+.registry-card,
+.feature-registry-card {
+  margin: 28px 0;
+  padding: 22px 24px;
+  border: 1px solid #e2e2e2;
+  border-radius: 14px;
+  background: #fafafa;
+}
+.registry-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.registry-label {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: .12em;
+  font-weight: 800;
+  color: #555;
+}
+.registry-card p,
+.feature-registry-card p {
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+.yaml-block {
+  margin: 18px 0 0;
+  padding: 18px;
+  overflow-x: auto;
+  border: 1px solid #e1e1e1;
+  border-radius: 10px;
+  background: #fff;
+  font-size: .84rem;
+  line-height: 1.6;
+}
+.yaml-block code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.feature-registry-card {
+  border-left: 3px solid var(--accent);
+  background: #f6f8ff;
+}
