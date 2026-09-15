@@ -285,14 +285,80 @@
     constraint using <strong>Catch@1%</strong>.
   </p>
 
-  <div class="results-table results-table-wide">
-  <div class="table-header"><span>Experiment</span><span>Validation</span><span>Objective</span><span>Description</span><span>Result</span></div>
-  <div class="table-row"><span><strong>Default AutoML</strong></span><span>Random</span><span>ROC-AUC</span><span>Standard AutoML with random train/validation splitting, searching across models and hyperparameters using ROC-AUC.</span><span><strong>0.842</strong></span></div>
-  <div class="table-row"><span><strong>Temporal baseline</strong></span><span>Temporal</span><span>ROC-AUC</span><span>Same baseline modelling approach, but evaluated using a time-based split to measure performance on future-like data.</span><span><strong>0.801</strong></span></div>
-  <div class="table-row"><span><strong>Business objective</strong></span><span>Temporal</span><span>Catch@1%</span><span>Uses temporal validation and optimises for the operational goal: the percentage of fraud captured within the top 1% highest-risk transactions.</span><span><strong>42.6%</strong></span></div>
-  <div class="table-row"><span><strong>CASH + TPE</strong></span><span>Temporal</span><span>Catch@1%</span><span>Searches across model families and hyperparameters using CASH, while TPE learns from previous trials to focus the search on promising configurations.</span><span><strong>48.9%</strong></span></div>
-  <div class="table-row"><span><strong>Full pipeline</strong></span><span>Temporal</span><span>Catch@1%</span><span>Complete pipeline combining point-in-time-safe data, leakage checks, feature selection, temporal validation, business-aligned optimisation, and CASH + TPE search.</span><span><strong>53.7%</strong></span></div>
+  <div class="results-table">
+    <div class="table-header">
+      <span>Experiment</span>
+      <span>Validation</span>
+      <span>Objective</span>
+      <span>Result</span>
+    </div>
+
+    <div class="table-row">
+      <span>Default AutoML</span>
+      <span>Random</span>
+      <span>ROC-AUC</span>
+      <strong>0.842</strong>
+    </div>
+
+    <div class="table-row">
+      <span>Temporal baseline</span>
+      <span>Temporal</span>
+      <span>ROC-AUC</span>
+      <strong>0.801</strong>
+    </div>
+
+    <div class="table-row">
+      <span>Business objective</span>
+      <span>Temporal</span>
+      <span>Catch@1%</span>
+      <strong>42.6%</strong>
+    </div>
+
+    <div class="table-row">
+      <span>CASH + TPE</span>
+      <span>Temporal</span>
+      <span>Catch@1%</span>
+      <strong>48.9%</strong>
+    </div>
+
+    <div class="table-row final-row">
+      <span>Full pipeline</span>
+      <span>Temporal</span>
+      <span>Catch@1%</span>
+      <strong>53.7%</strong>
+    </div>
+  </div>
+
+  
+<div class="experiment-descriptions">
+  <h3>What each experiment tests</h3>
+
+  <div class="experiment-description">
+    <strong>Default AutoML</strong>
+    <p>A standard AutoML setup using a random train/validation split. The search selects models and hyperparameters based on ROC-AUC.</p>
+  </div>
+
+  <div class="experiment-description">
+    <strong>Temporal baseline</strong>
+    <p>The baseline is evaluated with a time-based split, training on earlier transactions and validating on later transactions to better reflect future performance.</p>
+  </div>
+
+  <div class="experiment-description">
+    <strong>Business objective</strong>
+    <p>The evaluation objective changes from ROC-AUC to Catch@1%, aligning model selection with the operational constraint of reviewing only the highest-risk 1% of transactions.</p>
+  </div>
+
+  <div class="experiment-description">
+    <strong>CASH + TPE</strong>
+    <p>CASH searches across model families and hyperparameters, while TPE uses results from previous trials to guide the search toward promising configurations.</p>
+  </div>
+
+  <div class="experiment-description">
+    <strong>Full pipeline</strong>
+    <p>The complete approach combines point-in-time-safe data preparation, leakage checks, feature selection, temporal validation, business-aligned optimisation, and CASH + TPE search.</p>
+  </div>
 </div>
+
 <div class="result-explanation">
     <h3>What does the business objective mean?</h3>
 
