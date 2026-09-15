@@ -208,3 +208,43 @@ footer{border-top:1px solid var(--border);max-width:850px;margin:auto;padding:40
   margin: 0;
   line-height: 1.6;
 }
+
+/* Make gate examples clearly visible inside the interactive description panel */
+#feature-description {
+  min-height: 165px;
+  box-sizing: border-box;
+}
+#feature-description .gate-example {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-left: 3px solid var(--accent);
+  background: #f3f6ff;
+  border-radius: 0 10px 10px 0;
+}
+#feature-description .gate-example span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: .08em;
+  font-weight: 800;
+}
+#feature-description .gate-example p {
+  margin: 0;
+  line-height: 1.55;
+}
+#feature-description .gate-example code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .92em;
+}
+
+.feature-gates { grid-template-columns: repeat(6, 1fr); }
+@media (max-width: 900px) { .feature-gates { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .feature-gates { grid-template-columns: repeat(2, 1fr); } }
+#feature-description { min-height: 175px; }
+#feature-description .gate-example { display:block !important; margin-top:18px; padding:14px 18px; border-left:3px solid var(--accent); background:#f3f6ff; border-radius:0 10px 10px 0; line-height:1.55; }
+#feature-description .gate-example span { display:block; margin-bottom:6px; font-size:11px; letter-spacing:.08em; font-weight:800; }
+#feature-description .gate-example p { margin:0; }
+#feature-description .gate-example code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.92em; }

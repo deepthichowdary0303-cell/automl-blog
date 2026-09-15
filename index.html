@@ -104,16 +104,25 @@
   <div class="section-number">04</div>
   <h2>Feature selection is a sequence of gates</h2>
   <p>With hundreds or thousands of candidate features, simply ranking everything by feature importance is not enough.</p>
+  <p>An <strong>LLM agent first interprets the fraud use case</strong> and prioritises relevant feature families. For example, seller fraud may require seller-level behaviour, while account-takeover detection may emphasise device and login behaviour. Deterministic gates then verify that the selected candidates are safe, available and useful.</p>
   <div class="feature-gates">
-    <button class="feature-gate active" data-feature="availability"><span>01</span><strong>Availability</strong></button>
-    <button class="feature-gate" data-feature="leakage"><span>02</span><strong>Leakage</strong></button>
-    <button class="feature-gate" data-feature="stability"><span>03</span><strong>Stability</strong></button>
-    <button class="feature-gate" data-feature="redundancy"><span>04</span><strong>Redundancy</strong></button>
-    <button class="feature-gate" data-feature="importance"><span>05</span><strong>Importance</strong></button>
+    <button class="feature-gate active" data-feature="usecase"><span>01</span><strong>Use-case fit</strong></button>
+    <button class="feature-gate" data-feature="availability"><span>02</span><strong>Availability</strong></button>
+    <button class="feature-gate" data-feature="leakage"><span>03</span><strong>Leakage</strong></button>
+    <button class="feature-gate" data-feature="stability"><span>04</span><strong>Stability</strong></button>
+    <button class="feature-gate" data-feature="redundancy"><span>05</span><strong>Redundancy</strong></button>
+    <button class="feature-gate" data-feature="importance"><span>06</span><strong>Importance</strong></button>
   </div>
-  <div id="feature-description" class="feature-description"><strong>Availability</strong><p>Can the feature actually be computed when the fraud decision is made?</p><div class="gate-example"><span>Example</span><p>customer_chargeback_count_30d is updated only at end of day. If the transaction is scored at 10:00 AM, the feature is not available yet and should be rejected.</p></div></div>
+  <div id="feature-description" class="feature-description">
+  <strong>Use-case fit</strong>
+  <p>An LLM agent interprets the fraud use case and selects or prioritises candidate features that are relevant to that decision before deterministic quality gates are applied.</p>
+  <div class="gate-example">
+    <span>EXAMPLE</span>
+    <p>For a <strong>seller-fraud</strong> use case, the agent may prioritise seller-level behaviour such as <code>seller_txn_velocity_24h</code>, <code>seller_chargeback_rate_30d</code>, and <code>seller_account_age</code>, while deprioritising buyer-only features that do not describe seller risk.</p>
+  </div>
+</div>
   <div class="flow-code">
-    <span>Candidate features</span><span>↓</span><span>Availability gate</span><span>↓</span>
+    <span>Candidate features</span><span>↓</span><span>LLM use-case selection</span><span>↓</span><span>Availability gate</span><span>↓</span>
     <span>Point-in-time + leakage gate</span><span>↓</span><span>Stability + redundancy</span>
     <span>↓</span><span>Model-based importance</span><span>↓</span><strong>Selected features</strong>
   </div>
