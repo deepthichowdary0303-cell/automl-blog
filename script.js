@@ -23,27 +23,27 @@ document.addEventListener("DOMContentLoaded", () => {
     availability:[
       "Availability",
       "Can the feature actually be computed when the fraud decision is made?",
-      "Example: customer_chargeback_count_30d is updated only at end of day. If the transaction is scored at 10:00 AM, the feature is not available yet and should be rejected."
+      "customer_chargeback_count_30d is updated only at end of day. If the transaction is scored at 10:00 AM, the feature is not available yet and should be rejected."
     ],
     leakage:[
       "Leakage",
       "Does the feature contain future information or information directly derived from the target?",
-      "Example: transaction_dispute_status becomes “fraud” two days after the transaction. Using that value during the original decision would reveal the future, so the feature is rejected."
+      "transaction_dispute_status becomes “fraud” two days after the transaction. Using that value during the original decision would reveal the future, so the feature is rejected."
     ],
     stability:[
       "Stability",
       "Does the feature maintain a reliable relationship with the target across different time periods?",
-      "Example: a device-velocity feature behaves similarly across recent months. If its distribution suddenly changes because an upstream system changed its calculation, it should be flagged for instability."
+      "A device-velocity feature behaves similarly across recent months. If its distribution suddenly changes because an upstream system changed its calculation, it should be flagged for instability."
     ],
     redundancy:[
       "Redundancy",
       "Are multiple features carrying essentially the same signal? Removing redundancy can reduce search complexity.",
-      "Example: transactions_24h and transactions_1d measure essentially the same behaviour. Keeping both adds little new information, so one can be removed."
+      "transactions_24h and transactions_1d measure essentially the same behaviour. Keeping both adds little new information, so one can be removed."
     ],
     importance:[
       "Model-based Importance",
       "Only after surviving the previous gates should a feature compete on predictive contribution.",
-      "Example: device_velocity_1h passes the technical gates and shows meaningful predictive contribution in model-based importance analysis, so it is retained."
+      "device_velocity_1h passes the technical gates and shows meaningful predictive contribution in model-based importance analysis, so it is retained."
     ]
   };
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
       $$(".feature-gate").forEach(x => x.classList.remove("active"));
       btn.classList.add("active");
       const d = featureContent[btn.dataset.feature];
-      $("#feature-description").innerHTML = `<strong>${d[0]}</strong><p>${d[1]}</p><div class="gate-example"><strong>Example:</strong> ${d[2]}</div>`;
+      $("#feature-description").innerHTML = `<strong>${d[0]}</strong><p>${d[1]}</p><div class="gate-example"><span>Example</span><p>${d[2]}</p></div>`;
     });
   });
 

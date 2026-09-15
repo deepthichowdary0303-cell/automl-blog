@@ -111,7 +111,7 @@
     <button class="feature-gate" data-feature="redundancy"><span>04</span><strong>Redundancy</strong></button>
     <button class="feature-gate" data-feature="importance"><span>05</span><strong>Importance</strong></button>
   </div>
-  <div id="feature-description" class="feature-description"><strong>Availability</strong><p>Can the feature actually be computed when the fraud decision is made?</p><div class="gate-example"><strong>Example:</strong> customer_chargeback_count_30d is updated only at end of day. If the transaction is scored at 10:00 AM, the feature is not available yet and should be rejected.</div></div>
+  <div id="feature-description" class="feature-description"><strong>Availability</strong><p>Can the feature actually be computed when the fraud decision is made?</p><div class="gate-example"><span>Example</span><p>customer_chargeback_count_30d is updated only at end of day. If the transaction is scored at 10:00 AM, the feature is not available yet and should be rejected.</p></div></div>
   <div class="flow-code">
     <span>Candidate features</span><span>↓</span><span>Availability gate</span><span>↓</span>
     <span>Point-in-time + leakage gate</span><span>↓</span><span>Stability + redundancy</span>
