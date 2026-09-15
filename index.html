@@ -270,16 +270,57 @@
 
 <section id="results" class="article-section">
   <div class="section-number">10</div>
-  <h2>Experimental results</h2>
-  <p>Architecture explains how the system works. Experiments demonstrate whether it actually improves the modelling process.</p>
-  <div class="results-table">
-    <div class="table-header"><span>Experiment</span><span>Validation</span><span>Objective</span><span>Result</span></div>
-    <div class="table-row"><span>Default AutoML</span><span>Random</span><span>ROC-AUC</span><strong>—</strong></div>
-    <div class="table-row"><span>Temporal baseline</span><span>Temporal</span><span>ROC-AUC</span><strong>—</strong></div>
-    <div class="table-row"><span>Business objective</span><span>Temporal</span><span>Catch@1%</span><strong>—</strong></div>
-    <div class="table-row"><span>CASH + TPE</span><span>Temporal</span><span>Catch@1%</span><strong>—</strong></div>
-    <div class="table-row final-row"><span>Full pipeline</span><span>Temporal</span><span>Catch@1%</span><strong>—</strong></div>
+<h2>Experimental results</h2>
+<p>Architecture explains how the system works. Experiments demonstrate whether it actually improves the modelling process.</p>
+
+<div class="results-table">
+  <div class="table-header">
+    <span>Experiment</span>
+    <span>Validation</span>
+    <span>Objective</span>
+    <span>Result</span>
   </div>
+
+  <div class="table-row">
+    <span>Default AutoML</span>
+    <span>Random</span>
+    <span>ROC-AUC</span>
+    <strong>0.842</strong>
+  </div>
+
+  <div class="table-row">
+    <span>Temporal baseline</span>
+    <span>Temporal</span>
+    <span>ROC-AUC</span>
+    <strong>0.801</strong>
+  </div>
+
+  <div class="table-row">
+    <span>Business objective</span>
+    <span>Temporal</span>
+    <span>Catch@1%</span>
+    <strong>42.6%</strong>
+  </div>
+
+  <div class="table-row">
+    <span>CASH + TPE</span>
+    <span>Temporal</span>
+    <span>Catch@1%</span>
+    <strong>48.9%</strong>
+  </div>
+
+  <div class="table-row final-row">
+    <span>Full pipeline</span>
+    <span>Temporal</span>
+    <span>Catch@1%</span>
+    <strong>53.7%</strong>
+  </div>
+</div>
+
+<p class="result-note">
+  <strong>Illustrative results:</strong> Values shown above demonstrate the intended presentation format and should be replaced with measurements from the actual experiments before publication.
+</p>
+
 </section>
 
 <section class="article-section conclusion">
