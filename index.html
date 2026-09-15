@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Building an Agentic Fraud Modelling Pipeline</title>
+
+    <meta
+        name="description"
+        content="An engineering perspective on building an agentic fraud modelling pipeline using point-in-time-safe features, temporal validation, CASH and TPE."
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="nav">
+        <div class="brand">DS / ML</div>
+
+        <div class="nav-links">
+            <a href="#pipeline">Pipeline</a>
+            <a href="#features">Features</a>
+            <a href="#metrics">Metrics</a>
+            <a href="#search">Model Search</a>
+            <a href="#results">Results</a>
+        </div>
+    </div>
+</header>
+
+
+<main>
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+    <div class="eyebrow">
+        MACHINE LEARNING · FRAUD DETECTION · AGENTIC AI
+    </div>
+
+    <h1>
+        Building an Agentic<br>
+        Fraud Modelling Pipeline
+    </h1>
+
+    <p class="hero-subtitle">
+        From point-in-time-safe features to business-aligned
+        model search — designing fraud modelling as a
+        decision system, not just a model.
+    </p>
+
+    <div class="tags">
+        <span>Fraud Detection</span>
+        <span>AutoML</span>
+        <span>Bayesian Optimisation</span>
+        <span>MLOps</span>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     INTRO
+===================================================== -->
+
+<section class="article-section">
+
+    <p class="lead">
+        A fraud model can have an excellent ROC-AUC and still
+        be a poor production system.
+    </p>
+
+    <p>
+        Fraud modelling is constrained by much more than
+        predictive performance. Data availability, leakage,
+        temporal drift, review capacity, latency, feature
+        stability and business cost all influence whether
+        a model is actually useful.
+    </p>
+
+    <div class="callout">
+        <strong>The central idea</strong>
+
+        <p>
+            Let the agent reason about the problem.
+            Let deterministic code enforce the rules.
+        </p>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PIPELINE
+===================================================== -->
+
+<section id="pipeline" class="article-section">
+
+    <div class="section-number">01</div>
+
+    <h2>Explore the pipeline</h2>
+
+    <p>
+        Instead of presenting the architecture as a static
+        diagram, click through each stage to understand
+        what happens and why.
+    </p>
+
+
+    <div class="pipeline-container">
+
+        <div class="pipeline">
+
+            <button
+                class="pipeline-stage active"
+                data-stage="discovery"
+            >
+                <span class="stage-number">01</span>
+                <strong>Discovery</strong>
+                <small>Define the decision</small>
+            </button>
+
+
+            <div class="pipeline-arrow">→</div>
+
+
+            <button
+                class="pipeline-stage"
+                data-stage="temporal"
+            >
+                <span class="stage-number">02</span>
+                <strong>Temporal Data</strong>
+                <small>Respect time</small>
+            </button>
+
+
+            <div class="pipeline-arrow">→</div>
+
+
+            <button
+                class="pipeline-stage"
+                data-stage="features"
+            >
+                <span class="stage-number">03</span>
+                <strong>Feature Gates</strong>
+                <small>Remove invalid signals</small>
+            </button>
+
+
+            <div class="pipeline-arrow">→</div>
+
+
+            <button
+                class="pipeline-stage"
+                data-stage="search"
+            >
+                <span class="stage-number">04</span>
+                <strong>CASH + TPE</strong>
+                <small>Search intelligently</small>
+            </button>
+
+
+            <div class="pipeline-arrow">→</div>
+
+
+            <button
+                class="pipeline-stage"
+                data-stage="evaluation"
+            >
+                <span class="stage-number">05</span>
+                <strong>Evaluation</strong>
+                <small>Measure what matters</small>
+            </button>
+
+        </div>
+
+
+        <div id="pipeline-description" class="pipeline-description">
+
+            <strong>Discovery</strong>
+
+            <p>
+                Translate the business request into an explicit
+                specification: target, entity, scoring timestamp,
+                latency, review budget and optimisation objective.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     BUSINESS PROBLEM
+===================================================== -->
+
+<section class="article-section">
+
+    <div class="section-number">02</div>
+
+    <h2>Start with the decision, not the dataset</h2>
+
+    <p>
+        A common ML workflow starts with:
+    </p>
+
+    <blockquote>
+        "Here is the dataset. Which model should we train?"
+    </blockquote>
+
+    <p>
+        A better starting point is:
+    </p>
+
+    <blockquote>
+        "What decision are we trying to improve?"
+    </blockquote>
+
+
+    <div class="spec-card">
+
+        <div class="spec-row">
+            <span>Use case</span>
+            <strong>Transaction fraud</strong>
+        </div>
+
+        <div class="spec-row">
+            <span>Entity</span>
+            <strong>Transaction</strong>
+        </div>
+
+        <div class="spec-row">
+            <span>Target</span>
+            <strong>Fraud / Non-fraud</strong>
+        </div>
+
+        <div class="spec-row">
+            <span>Scoring timestamp</span>
+            <strong>Transaction time</strong>
+        </div>
+
+        <div class="spec-row">
+            <span>Latency</span>
+            <strong>Real-time</strong>
+        </div>
+
+        <div class="spec-row">
+            <span>Review budget</span>
+            <strong>Top 1%</strong>
+        </div>
+
+        <div class="spec-row">
+            <span>Objective</span>
+            <strong>Maximise Catch@1%</strong>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     POINT IN TIME
+===================================================== -->
+
+<section class="article-section">
+
+    <div class="section-number">03</div>
+
+    <h2>Point-in-time correctness</h2>
+
+    <p>
+        Suppose a transaction occurs at <strong>T0</strong>.
+        Every feature used by the model must represent
+        information that genuinely existed at that moment.
+    </p>
+
+
+    <div class="timeline">
+
+        <div class="timeline-item safe">
+
+            <div class="timeline-dot"></div>
+
+            <div>
+                <span class="timeline-label">T0 · SCORING</span>
+
+                <h3>Information available at decision time</h3>
+
+                <p>
+                    Transaction amount, device information,
+                    account age and historical behaviour may
+                    be valid inputs.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-item">
+
+            <div class="timeline-dot"></div>
+
+            <div>
+                <span class="timeline-label">T+7 · INVESTIGATION</span>
+
+                <h3>New information begins to appear</h3>
+
+                <p>
+                    Investigation processes can generate
+                    information that did not exist at T0.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="timeline-item leakage">
+
+            <div class="timeline-dot"></div>
+
+            <div>
+                <span class="timeline-label">T+14 · CONFIRMED FRAUD</span>
+
+                <h3>Predictive — but unavailable at T0</h3>
+
+                <p>
+                    Investigation outcomes may be highly
+                    predictive, but using them as T0 features
+                    creates temporal leakage.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="callout">
+
+        <strong>Important distinction</strong>
+
+        <p>
+            Predictive power does not make a feature valid.
+            Availability at the scoring timestamp does.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FEATURE SELECTION
+===================================================== -->
+
+<section id="features" class="article-section">
+
+    <div class="section-number">04</div>
+
+    <h2>Feature selection is a sequence of gates</h2>
+
+    <p>
+        With hundreds or thousands of candidate features,
+        simply ranking everything by feature importance
+        is not enough.
+    </p>
+
+
+    <div class="feature-gates">
+
+        <button class="feature-gate active" data-feature="availability">
+            <span>01</span>
+            <strong>Availability</strong>
+        </button>
+
+        <button class="feature-gate" data-feature="leakage">
+            <span>02</span>
+            <strong>Leakage</strong>
+        </button>
+
+        <button class="feature-gate" data-feature="stability">
+            <span>03</span>
+            <strong>Stability</strong>
+        </button>
+
+        <button class="feature-gate" data-feature="redundancy">
+            <span>04</span>
+            <strong>Redundancy</strong>
+        </button>
+
+        <button class="feature-gate" data-feature="importance">
+            <span>05</span>
+            <strong>Importance</strong>
+        </button>
+
+    </div>
+
+
+    <div id="feature-description" class="feature-description">
+
+        <strong>Availability</strong>
+
+        <p>
+            Can the feature actually be computed when
+            the fraud decision is made?
+        </p>
+
+    </div>
+
+
+    <div class="flow-code">
+
+        <span>Candidate features</span>
+        <span>↓</span>
+        <span>Availability gate</span>
+        <span>↓</span>
+        <span>Point-in-time + leakage gate</span>
+        <span>↓</span>
+        <span>Stability + redundancy</span>
+        <span>↓</span>
+        <span>Model-based importance</span>
+        <span>↓</span>
+        <strong>Selected features</strong>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     METRICS
+===================================================== -->
+
+<section id="metrics" class="article-section">
+
+    <div class="section-number">05</div>
+
+    <h2>ROC-AUC vs Catch@1%</h2>
+
+    <p>
+        Imagine a fraud operations team can manually
+        investigate only the highest-risk 1% of transactions.
+    </p>
+
+    <p>
+        The question is no longer simply:
+    </p>
+
+    <blockquote>
+        "How well does the model rank transactions overall?"
+    </blockquote>
+
+    <p>
+        It becomes:
+    </p>
+
+    <blockquote>
+        "How much fraud can we capture inside the 1% we can actually review?"
+    </blockquote>
+
+
+    <div class="metric-selector">
+
+        <button class="metric-tab active" data-metric="auc">
+            ROC-AUC
+        </button>
+
+        <button class="metric-tab" data-metric="catch">
+            Catch@1%
+        </button>
+
+        <button class="metric-tab" data-metric="business">
+            Business View
+        </button>
+
+    </div>
+
+
+    <div id="metric-description" class="metric-description">
+
+        <h3>ROC-AUC</h3>
+
+        <p>
+            ROC-AUC evaluates how well the model ranks
+            positive examples above negative examples
+            across thresholds.
+        </p>
+
+        <p>
+            It is useful for measuring general discrimination,
+            but it does not directly encode a fixed
+            investigation capacity.
+        </p>
+
+    </div>
+
+
+    <div class="illustrative-results">
+
+        <div class="result-row">
+
+            <span>Model A</span>
+
+            <div class="result-bar">
+                <div style="width:94%"></div>
+            </div>
+
+            <strong>0.94</strong>
+
+        </div>
+
+
+        <div class="result-row highlighted">
+
+            <span>Model B</span>
+
+            <div class="result-bar">
+                <div style="width:92%"></div>
+            </div>
+
+            <strong>0.92</strong>
+
+        </div>
+
+    </div>
+
+
+    <p class="note">
+        Illustrative values only. Replace these with actual
+        experiment results before publication.
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     CASH / TPE
+===================================================== -->
+
+<section id="search" class="article-section">
+
+    <div class="section-number">06</div>
+
+    <h2>Turn model selection into a search problem</h2>
+
+    <p>
+        Choosing a model family and then tuning it sequentially
+        can be inefficient.
+    </p>
+
+    <p>
+        Instead, treat the problem as a joint search over:
+    </p>
+
+
+    <div class="search-grid">
+
+        <div class="search-card">
+
+            <span>01</span>
+
+            <h3>Model family</h3>
+
+            <p>
+                LightGBM<br>
+                XGBoost<br>
+                CatBoost<br>
+                Neural models
+            </p>
+
+        </div>
+
+
+        <div class="search-arrow">→</div>
+
+
+        <div class="search-card">
+
+            <span>02</span>
+
+            <h3>Feature subset</h3>
+
+            <p>
+                Eligible features
+                surviving the
+                feature gates.
+            </p>
+
+        </div>
+
+
+        <div class="search-arrow">→</div>
+
+
+        <div class="search-card">
+
+            <span>03</span>
+
+            <h3>Hyperparameters</h3>
+
+            <p>
+                Depth<br>
+                Learning rate<br>
+                Regularisation<br>
+                Model-specific parameters
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="search-loop">
+
+        <div>Candidate configuration</div>
+
+        <span>↓</span>
+
+        <div>Temporal evaluation</div>
+
+        <span>↓</span>
+
+        <div>Catch@1%</div>
+
+        <span>↓</span>
+
+        <div>Reward</div>
+
+        <span>↓</span>
+
+        <div>Next trial</div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     TPE SIMULATION
+===================================================== -->
+
+<section class="article-section">
+
+    <div class="section-number">07</div>
+
+    <h2>Why TPE?</h2>
+
+    <p>
+        Random search does not learn much from previous
+        experiments. Bayesian optimisation methods such as
+        Tree-structured Parzen Estimation use trial history
+        to guide subsequent experiments.
+    </p>
+
+
+    <div class="simulation">
+
+        <div class="simulation-header">
+
+            <div>
+
+                <span class="label">
+                    INTERACTIVE SIMULATION
+                </span>
+
+                <h3>Optimisation progress</h3>
+
+            </div>
+
+            <div id="best-score" class="best-score">
+                0%
+            </div>
+
+        </div>
+
+
+        <div class="progress-track">
+
+            <div
+                id="progress-bar"
+                class="progress-bar"
+            ></div>
+
+        </div>
+
+
+        <div class="simulation-controls">
+
+            <button id="run-trial">
+                Run trial
+            </button>
+
+            <button id="reset-trials" class="secondary">
+                Reset
+            </button>
+
+        </div>
+
+
+        <p id="trial-message" class="trial-message">
+            No trials have been completed.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     AGENT
+===================================================== -->
+
+<section class="article-section">
+
+    <div class="section-number">08</div>
+
+    <h2>Where does the agent fit?</h2>
+
+
+    <div class="agent-grid">
+
+        <div class="agent-card">
+
+            <span class="agent-label">
+                AGENT
+            </span>
+
+            <h3>Reason & orchestrate</h3>
+
+            <p>
+                Interpret requirements, plan experiments,
+                select workflows and summarise results.
+            </p>
+
+        </div>
+
+
+        <div class="agent-card">
+
+            <span class="agent-label">
+                DETERMINISTIC CODE
+            </span>
+
+            <h3>Enforce & verify</h3>
+
+            <p>
+                Run leakage checks, temporal splits,
+                feature validation, training and
+                metric calculation.
+            </p>
+
+        </div>
+
+
+        <div class="agent-card">
+
+            <span class="agent-label">
+                EXPERIMENT SYSTEM
+            </span>
+
+            <h3>Remember & audit</h3>
+
+            <p>
+                Store specifications, datasets,
+                features, configurations, metrics
+                and checkpoints.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ARCHITECTURE
+===================================================== -->
+
+<section class="article-section">
+
+    <div class="section-number">09</div>
+
+    <h2>The complete architecture</h2>
+
+
+    <div class="architecture">
+
+        <div>Business objective</div>
+        <span>↓</span>
+
+        <div>Agent / Planner</div>
+        <span>↓</span>
+
+        <div>Project specification</div>
+        <span>↓</span>
+
+        <div>Temporal data preparation</div>
+        <span>↓</span>
+
+        <div class="split">
+
+            <div>Availability gate</div>
+            <div>Leakage gate</div>
+
+        </div>
+
+        <span>↓</span>
+
+        <div>Feature selection</div>
+        <span>↓</span>
+
+        <div>CASH + TPE model search</div>
+        <span>↓</span>
+
+        <div>Temporal evaluation</div>
+        <span>↓</span>
+
+        <div>Catch@K% / Business objective</div>
+        <span>↓</span>
+
+        <div>Checkpoint + audit trail</div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RESULTS
+===================================================== -->
+
+<section id="results" class="article-section">
+
+    <div class="section-number">10</div>
+
+    <h2>Experimental results</h2>
+
+    <p>
+        Architecture explains how the system works.
+        Experiments demonstrate whether it actually
+        improves the modelling process.
+    </p>
+
+
+    <div class="results-table">
+
+        <div class="table-header">
+            <span>Experiment</span>
+            <span>Validation</span>
+            <span>Objective</span>
+            <span>Result</span>
+        </div>
+
+
+        <div class="table-row">
+            <span>Default AutoML</span>
+            <span>Random</span>
+            <span>ROC-AUC</span>
+            <strong>—</strong>
+        </div>
+
+
+        <div class="table-row">
+            <span>Temporal baseline</span>
+            <span>Temporal</span>
+            <span>ROC-AUC</span>
+            <strong>—</strong>
+        </div>
+
+
+        <div class="table-row">
+            <span>Business objective</span>
+            <span>Temporal</span>
+            <span>Catch@1%</span>
+            <strong>—</strong>
+        </div>
+
+
+        <div class="table-row">
+            <span>CASH + TPE</span>
+            <span>Temporal</span>
+            <span>Catch@1%</span>
+            <strong>—</strong>
+        </div>
+
+
+        <div class="table-row final-row">
+            <span>Full pipeline</span>
+            <span>Temporal</span>
+            <span>Catch@1%</span>
+            <strong>—</strong>
+        </div>
+
+    </div>
+
+
+    <div class="callout">
+
+        <strong>Publication note</strong>
+
+        <p>
+            Replace the placeholders above with actual
+            experimental results. Avoid publishing
+            illustrative numbers as measured results.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CONCLUSION
+===================================================== -->
+
+<section class="article-section conclusion">
+
+    <div class="section-number">11</div>
+
+    <h2>The bigger lesson</h2>
+
+    <p>
+        The interesting part of an agentic fraud modelling
+        system isn't simply adding an LLM to an AutoML pipeline.
+    </p>
+
+    <p>
+        The interesting part is connecting
+        <strong>business intent, temporal correctness,
+        feature eligibility, model search and operational
+        evaluation</strong> into one reproducible workflow.
+    </p>
+
+
+    <div class="final-principles">
+
+        <div>
+            <strong>LLMs</strong>
+            <span>Reason</span>
+        </div>
+
+        <div>
+            <strong>Deterministic pipelines</strong>
+            <span>Enforce</span>
+        </div>
+
+        <div>
+            <strong>Optimisers</strong>
+            <span>Search</span>
+        </div>
+
+        <div>
+            <strong>Temporal validation</strong>
+            <span>Challenge</span>
+        </div>
+
+        <div>
+            <strong>Business metrics</strong>
+            <span>Define success</span>
+        </div>
+
+    </div>
+
+
+    <p>
+        The model is still important. But the larger
+        engineering challenge is building a system that can
+        reliably decide <strong>what model should be built,
+        what information it is allowed to see, how it should
+        be evaluated, and whether its performance actually
+        matters to the business.</strong>
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <div class="footer-stack">
+
+        <div>
+            <strong>Tech stack</strong>
+
+            <p>
+                Python · LightGBM · XGBoost · CatBoost ·
+                TPE · Bayesian Optimisation · LLMs ·
+                RAG · Feature Engineering · Temporal
+                Validation · MLOps
+            </p>
+        </div>
+
+
+        <div class="footer-links">
+
+            <a href="#" target="_blank">
+                GitHub
+            </a>
+
+            <a href="#" target="_blank">
+                LinkedIn
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <p class="copyright">
+        © 2026 · Technical case study
+    </p>
+
+</footer>
+
+</main>
+
+<script src="script.js"></script>
+
+</body>
+</html>
