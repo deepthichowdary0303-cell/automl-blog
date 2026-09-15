@@ -111,7 +111,7 @@
     <button class="feature-gate" data-feature="redundancy"><span>04</span><strong>Redundancy</strong></button>
     <button class="feature-gate" data-feature="importance"><span>05</span><strong>Importance</strong></button>
   </div>
-  <div id="feature-description" class="feature-description"><strong>Availability</strong><p>Can the feature actually be computed when the fraud decision is made?</p></div>
+  <div id="feature-description" class="feature-description"><strong>Availability</strong><p>Can the feature actually be computed when the fraud decision is made?</p><div class="gate-example"><strong>Example:</strong> customer_chargeback_count_30d is updated only at end of day. If the transaction is scored at 10:00 AM, the feature is not available yet and should be rejected.</div></div>
   <div class="flow-code">
     <span>Candidate features</span><span>↓</span><span>Availability gate</span><span>↓</span>
     <span>Point-in-time + leakage gate</span><span>↓</span><span>Stability + redundancy</span>
@@ -270,19 +270,18 @@
 
 <section id="results" class="article-section">
   <div class="section-number">10</div>
-
   <h2>Experimental results</h2>
 
   <p>
     Architecture explains how the system works. Experiments demonstrate whether
-    it actually improves the modelling process.
+    each modelling decision changes the way the problem is evaluated.
   </p>
 
   <p>
-    The experiments compare progressively stronger modelling strategies.
-    The first two experiments use <strong>ROC-AUC</strong>, while the later
-    experiments align model selection with the operational fraud-review
-    constraint using <strong>Catch@1%</strong>.
+    Rather than presenting numerical results without the underlying dataset,
+    split definitions, trial logs and reproducibility artifacts, this section
+    focuses on the <strong>experimental progression</strong>: what is changed
+    in each experiment and what question that experiment is designed to answer.
   </p>
 
   <div class="results-table">
@@ -290,162 +289,60 @@
       <span>Experiment</span>
       <span>Validation</span>
       <span>Objective</span>
-      <span>Result</span>
+      <span>What it tests</span>
     </div>
 
     <div class="table-row">
-      <span>Default AutoML</span>
+      <span><strong>Default AutoML</strong></span>
       <span>Random</span>
       <span>ROC-AUC</span>
-      <strong>0.842</strong>
+      <span>Establishes how a conventional AutoML setup performs when using a random train/validation split.</span>
     </div>
 
     <div class="table-row">
-      <span>Temporal baseline</span>
+      <span><strong>Temporal baseline</strong></span>
       <span>Temporal</span>
       <span>ROC-AUC</span>
-      <strong>0.801</strong>
+      <span>Tests whether performance changes when validation reflects the chronological nature of fraud data.</span>
     </div>
 
     <div class="table-row">
-      <span>Business objective</span>
+      <span><strong>Business objective</strong></span>
       <span>Temporal</span>
       <span>Catch@1%</span>
-      <strong>42.6%</strong>
+      <span>Changes the optimisation target from general ranking quality to the operational fraud-review constraint.</span>
     </div>
 
     <div class="table-row">
-      <span>CASH + TPE</span>
+      <span><strong>CASH + TPE</strong></span>
       <span>Temporal</span>
       <span>Catch@1%</span>
-      <strong>48.9%</strong>
+      <span>Tests whether joint model-family and hyperparameter search can use previous trial outcomes to make the search more efficient.</span>
     </div>
 
     <div class="table-row final-row">
-      <span>Full pipeline</span>
+      <span><strong>Full pipeline</strong></span>
       <span>Temporal</span>
       <span>Catch@1%</span>
-      <strong>53.7%</strong>
+      <span>Evaluates the complete workflow, combining point-in-time-safe data, feature gates, business-aligned evaluation and guided model search.</span>
     </div>
-  </div>
-
-  
-<div class="experiment-descriptions">
-  <h3>What each experiment tests</h3>
-
-  <div class="experiment-description">
-    <strong>Default AutoML</strong>
-    <p>A standard AutoML setup using a random train/validation split. The search selects models and hyperparameters based on ROC-AUC.</p>
-  </div>
-
-  <div class="experiment-description">
-    <strong>Temporal baseline</strong>
-    <p>The baseline is evaluated with a time-based split, training on earlier transactions and validating on later transactions to better reflect future performance.</p>
-  </div>
-
-  <div class="experiment-description">
-    <strong>Business objective</strong>
-    <p>The evaluation objective changes from ROC-AUC to Catch@1%, aligning model selection with the operational constraint of reviewing only the highest-risk 1% of transactions.</p>
-  </div>
-
-  <div class="experiment-description">
-    <strong>CASH + TPE</strong>
-    <p>CASH searches across model families and hyperparameters, while TPE uses results from previous trials to guide the search toward promising configurations.</p>
-  </div>
-
-  <div class="experiment-description">
-    <strong>Full pipeline</strong>
-    <p>The complete approach combines point-in-time-safe data preparation, leakage checks, feature selection, temporal validation, business-aligned optimisation, and CASH + TPE search.</p>
-  </div>
-</div>
-
-<div class="result-explanation">
-    <h3>What does the business objective mean?</h3>
-
-    <p>
-      In fraud detection, the model may score thousands or millions of
-      transactions, but the fraud operations team typically has a limited
-      capacity for manual investigation.
-    </p>
-
-    <p>
-      If investigators can review only the <strong>top 1%</strong> of
-      transactions ranked by fraud risk, the relevant business question is:
-    </p>
-
-    <blockquote>
-      How much of the actual fraud can we capture within that top 1%?
-    </blockquote>
-
-    <p>
-      This is what <strong>Catch@1%</strong> measures. It is the percentage
-      of all actual fraud cases that appear within the highest-risk 1% of
-      transactions.
-    </p>
-
-    <div class="formula-box">
-      <strong>Catch@1%</strong> =
-      <strong>Fraud cases captured in the top 1% ÷ Total fraud cases</strong>
-      × 100
-    </div>
-
-    <p>
-      For example, if a test period contains 500 actual fraud cases and
-      213 of them fall within the highest-risk 1% of transactions:
-    </p>
-
-    <div class="formula-box">
-      Catch@1% = <strong>213 ÷ 500 = 42.6%</strong>
-    </div>
-
-    <p>
-      Therefore, the <strong>42.6%</strong> result in the Business Objective
-      experiment means that 42.6% of the fraud cases were captured within
-      the top 1% of transactions selected for review.
-    </p>
   </div>
 
   <div class="result-explanation">
-    <h3>What do the experiments show?</h3>
+    <h3>Why structure the experiments this way?</h3>
 
     <p>
-      The <strong>Default AutoML</strong> experiment achieves a ROC-AUC of
-      <strong>0.842</strong> using random validation. When the evaluation
-      is changed to a <strong>temporal split</strong>, the ROC-AUC falls to
-      <strong>0.801</strong>. This highlights why temporal validation is
-      important when future transactions may differ from historical data.
+      Each experiment isolates a modelling decision. The first comparison
+      highlights the difference between random and temporal validation. The
+      next changes the objective to match the fraud team's review capacity.
+      CASH + TPE then tests the search strategy, and the final experiment
+      evaluates the complete pipeline as an integrated workflow.
     </p>
 
     <p>
-      The next experiment changes the optimisation objective from general
-      ranking quality to the operational objective of <strong>Catch@1%</strong>.
-      This establishes a business-aligned baseline of <strong>42.6%</strong>.
-    </p>
-
-    <p>
-      <strong>CASH + TPE</strong> then searches across model configurations
-      and hyperparameters while using information from previous trials to
-      guide subsequent experiments. Catch@1% increases from
-      <strong>42.6%</strong> to <strong>48.9%</strong>.
-    </p>
-
-    <p>
-      Finally, the <strong>full pipeline</strong> combines the modelling
-      search with the earlier data and feature controls, including temporal
-      validation, feature eligibility and leakage-aware selection.
-      Catch@1% reaches <strong>53.7%</strong>.
-    </p>
-  </div>
-
-  <div class="result-takeaway">
-    <strong>The key takeaway</strong>
-
-    <p>
-      Catch@1% improves from <strong>42.6% → 48.9% → 53.7%</strong> as the
-      pipeline moves from a business-aligned baseline to intelligent model
-      search and then to the full data-and-feature-aware workflow.
-      In other words, the final pipeline captures more fraud within the
-      same fixed review budget.
+      This progression makes the contribution easier to reason about without
+      claiming numerical improvement that cannot be independently reproduced
+      from the information published on this page.
     </p>
   </div>
 </section>
