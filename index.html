@@ -271,7 +271,18 @@
 <section id="results" class="article-section">
   <div class="section-number">10</div>
 <h2>Experimental results</h2>
-<p>Architecture explains how the system works. Experiments demonstrate whether it actually improves the modelling process.</p>
+
+<p>
+  Architecture explains how the system works. Experiments demonstrate whether
+  it actually improves the modelling process.
+</p>
+
+<p>
+  The experiments below compare progressively stronger modelling strategies.
+  The first two experiments use <strong>ROC-AUC</strong> as the optimisation
+  objective, while the later experiments align the model with the operational
+  fraud-review constraint using <strong>Catch@1%</strong>.
+</p>
 
 <div class="results-table">
   <div class="table-header">
@@ -317,8 +328,106 @@
   </div>
 </div>
 
+
+<div class="result-explanation">
+
+  <h3>What does the business objective mean?</h3>
+
+  <p>
+    In fraud detection, the model may score thousands or millions of
+    transactions, but the fraud operations team usually has a limited
+    capacity for manual investigation.
+  </p>
+
+  <p>
+    Suppose investigators can review only the <strong>top 1%</strong> of
+    transactions ranked by fraud risk. The business question then becomes:
+  </p>
+
+  <blockquote>
+    How much of the actual fraud can we capture inside that top 1%?
+  </blockquote>
+
+  <p>
+    This is measured using <strong>Catch@1%</strong>.
+  </p>
+
+  <p>
+    For example, if the test period contains 500 fraudulent transactions and
+    213 of them appear within the highest-risk 1% of transactions:
+  </p>
+
+  <div class="formula-box">
+    Catch@1% =
+    <strong>213 / 500 = 42.6%</strong>
+  </div>
+
+  <p>
+    Therefore, the <strong>42.6%</strong> result for the Business Objective
+    experiment means that the model captured 42.6% of all fraud cases while
+    examining only the highest-risk 1% of transactions.
+  </p>
+
+</div>
+
+
+<div class="result-explanation">
+
+  <h3>Why does the performance improve?</h3>
+
+  <p>
+    The <strong>Default AutoML</strong> experiment achieves a ROC-AUC of
+    <strong>0.842</strong> using random validation. However, fraud data is
+    often temporal and non-stationary, so random validation can provide an
+    overly optimistic estimate of future performance.
+  </p>
+
+  <p>
+    When the same modelling problem is evaluated using a
+    <strong>temporal split</strong>, the ROC-AUC falls to
+    <strong>0.801</strong>. This provides a more realistic estimate of how the
+    model may behave on future transactions.
+  </p>
+
+  <p>
+    The next experiment changes the optimisation target from general ranking
+    quality to the actual operational objective: <strong>Catch@1%</strong>.
+    This produces a baseline Catch@1% of <strong>42.6%</strong>.
+  </p>
+
+  <p>
+    <strong>CASH + TPE</strong> then searches across model configurations and
+    hyperparameters while using previous trials to guide subsequent
+    experiments. Catch@1% increases to <strong>48.9%</strong>.
+  </p>
+
+  <p>
+    Finally, the <strong>full pipeline</strong> combines the modelling search
+    with the earlier data and feature controls, including temporal validation,
+    feature eligibility and leakage-aware selection. The resulting
+    Catch@1% reaches <strong>53.7%</strong>.
+  </p>
+
+</div>
+
+
+<div class="result-takeaway">
+
+  <strong>The key takeaway</strong>
+
+  <p>
+    The progression from <strong>42.6% → 48.9% → 53.7%</strong> shows how
+    aligning optimisation with the operational objective and improving the
+    search and feature pipeline can increase the amount of fraud captured
+    within a fixed review budget.
+  </p>
+
+</div>
+
+
 <p class="result-note">
-  <strong>Illustrative results:</strong> Values shown above demonstrate the intended presentation format and should be replaced with measurements from the actual experiments before publication.
+  <strong>Illustrative results:</strong>
+  Values shown are for demonstration purposes only.
 </p>
 
 </section>
